@@ -2,10 +2,13 @@ import { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
 import OpenAI from 'openai';
+import { DEFAULT_CONFIG_NAME, getConfig } from './config';
 
 if (started) {
   app.quit();
 }
+
+const config = getConfig(DEFAULT_CONFIG_NAME);
 
 interface ChatMessage {
   role: 'system' | 'user' | 'assistant';
@@ -18,8 +21,8 @@ interface VLLMResponse {
 }
 
 const client = new OpenAI({
-  baseURL: 'http://gx10-9803.local:8000/v1',
-  apiKey: 'not-needed',
+  baseURL: config.endpoint,
+  apiKey: config.apiKey,
 });
 
 const SYSTEM_PROMPT = 'You are a helpful assistant.';
@@ -46,10 +49,10 @@ ipcMain.handle('ai:chat', async (_event, prompt: string) => {
   console.log('[AI Chat] Messages sent:', messagesToSend);
 
   const response = await client.chat.completions.create({
-    model: 'RedHatAI/Qwen3.6-35B-A3B-NVFP4',
+    model: config.modelName,
     messages: messagesToSend,
-    temperature: 0.7,
-    max_tokens: 70000,
+    temperature: config.temperature,
+    max_tokens: config.maxTokens,
   });
 
   const vllmResponse: VLLMResponse = {
