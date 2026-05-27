@@ -18,6 +18,9 @@ interface AIAPI {
   getMessages: () => Promise<ChatMessage[]>;
   clear: () => Promise<ChatMessage[]>;
   getContextSize: () => Promise<ContextSize>;
+  deleteConfig: (name: string) => Promise<void>;
+  saveConfig: (name: string, config: any) => Promise<void>;
+  getAllConfigs: () => Promise<Record<string, AIConfig>>;
 }
 
 declare global {
@@ -31,4 +34,7 @@ export const aiAPI: AIAPI = {
   getMessages: () => window.aiAPI.getMessages(),
   clear: () => window.aiAPI.clear(),
   getContextSize: () => window.aiAPI.getContextSize(),
+  deleteConfig: (name: string) => window.aiAPI.deleteConfig(name),
+  saveConfig: (name: string, config: any) => window.aiAPI.saveConfig(name, config),
+  getAllConfigs: () => window.aiAPI.getAllConfigs(),
 };

@@ -3,14 +3,15 @@
   "productName": "skrybe",
   "version": "1.0.0",
   "description": "My Electron application description",
-  "main": ".vite/build/main.js",
   "private": true,
+  "main": "./out/main/index.js",
   "scripts": {
-    "start": "electron-forge start",
-    "package": "electron-forge package",
-    "make": "electron-forge make",
-    "publish": "electron-forge publish",
-    "lint": "eslint --ext .ts,.tsx ."
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "preview": "electron-vite preview",
+    "start": "electron-vite . start",
+    "lint": "eslint --ext .ts,.tsx .",
+    "package": "electron-vite build && electron-builder"
   },
   "keywords": [],
   "author": {
@@ -19,16 +20,8 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@electron-forge/cli": "^7.11.1",
-    "@electron-forge/maker-deb": "^7.11.1",
-    "@electron-forge/maker-rpm": "^7.11.1",
-    "@electron-forge/maker-squirrel": "^7.11.1",
-    "@electron-forge/maker-zip": "^7.11.1",
-    "@electron-forge/plugin-auto-unpack-natives": "^7.11.1",
-    "@electron-forge/plugin-fuses": "^7.11.1",
-    "@electron-forge/plugin-vite": "^7.11.1",
-    "@electron-forge/publisher-github": "^7.11.1",
     "@electron/fuses": "^1.8.0",
+    "@tailwindcss/vite": "^4.3.0",
     "@types/electron-squirrel-startup": "^1.0.2",
     "@types/node": "^25.6.0",
     "@types/react": "^19.2.14",
@@ -37,16 +30,24 @@
     "@typescript-eslint/parser": "^5.62.0",
     "@vitejs/plugin-react": "^4.7.0",
     "electron": "41.5.0",
+    "electron-builder": "^26.8.1",
+    "electron-vite": "^5.0.0",
     "eslint": "^8.57.1",
     "eslint-plugin-import": "^2.32.0",
+    "tailwindcss": "^4.3.0",
     "typescript": "5.9",
     "vite": "^5.4.21"
   },
   "dependencies": {
+    "@radix-ui/react-select": "^2.2.6",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "electron-squirrel-startup": "^1.0.1",
+    "lucide-react": "^1.16.0",
     "openai": "^5.0.0",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
-    "react-markdown": "^10.1.0"
+    "react-markdown": "^10.1.0",
+    "tailwind-merge": "^3.6.0"
   }
 }

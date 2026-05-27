@@ -8,20 +8,24 @@ export interface AIConfig {
   maxTokens: number;
 }
 
-export const CONFIGS: Record<string, AIConfig> = {
-  [DEFAULT_CONFIG_NAME]: {
-    endpoint: 'http://gx10-9803.local:8000/v1',
-    apiKey: 'not-needed',
-    modelName: 'RedHatAI/Qwen3.6-35B-A3B-NVFP4',
-    temperature: 0.7,
-    maxTokens: 70000,
-  },
-};
+export interface Configs {
+  [name: string]: AIConfig;
+}
+
+let configs: Configs = {};
+
+export function setConfigs(cfg: Configs): void {
+  configs = cfg;
+}
 
 export function getConfig(name: string): AIConfig {
-  const config = CONFIGS[name];
+  const config = configs[name];
   if (!config) {
     throw new Error(`Unknown AI config: ${name}`);
   }
   return config;
+}
+
+export function getConfigs(): Configs {
+  return configs;
 }

@@ -1,13 +1,79 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
-import path from 'node:path';
 import started from 'electron-squirrel-startup';
 import OpenAI from 'openai';
-import { DEFAULT_CONFIG_NAME, getConfig } from './config';
+import * as fs from 'fs';
+import * as os from 'os';
+import { DEFAULT_CONFIG_NAME, getConfig, getConfigs, setConfigs } from '../config';
+
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Reconstruct __dirname for strict ES Modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 if (started) {
   app.quit();
 }
 
+function findConfigPath(): string | null {
+  const candidates = [
+    path.join(process.resourcesPath || '', '.skrybe.json'),
+    path.join(os.homedir(), '.skrybe.json'),
+  ];
+  for (const candidate of candidates) {
+    if (fs.existsSync(candidate)) {
+      return candidate;
+    }
+  }
+  return null;
+}
+
+function loadConfigs(): void {
+  const configPath = findConfigPath();
+  if (configPath) {
+    const content = fs.readFileSync(configPath, 'utf-8');
+    setConfigs(JSON.parse(content));
+  } else {
+    setConfigs({
+      [DEFAULT_CONFIG_NAME]: {
+        endpoint: 'http://gx10-9803.local:8000/v1',
+        apiKey: 'not-needed',
+        modelName: 'RedHatAI/Qwen3.6-35B-A3B-NVFP4',
+        temperature: 0.7,
+        maxTokens: 70000,
+      },
+    });
+  }
+}
+
+ipcMain.handle('config:getAll', () => {
+  return getConfigs();
+});
+
+ipcMain.handle('config:save', (_event, name: string, config: any) => {
+  const configPath = findConfigPath();
+  if (configPath) {
+    const content = fs.readFileSync(configPath, 'utf-8');
+    const configs = JSON.parse(content);
+    configs[name] = config;
+    fs.writeFileSync(configPath, JSON.stringify(configs, null, 2));
+    loadConfigs();
+  }
+});
+
+ipcMain.handle('config:delete', (_event, name: string) => {
+  const configPath = findConfigPath();
+  if (configPath && name !== DEFAULT_CONFIG_NAME) {
+    const content = fs.readFileSync(configPath, 'utf-8');
+    const configs = JSON.parse(content);
+    delete configs[name];
+    fs.writeFileSync(configPath, JSON.stringify(configs, null, 2));
+    loadConfigs();
+  }
+});
+
+loadConfigs();
 const config = getConfig(DEFAULT_CONFIG_NAME);
 
 interface ChatMessage {
@@ -96,16 +162,18 @@ const createWindow = () => {
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      // electron-vite bundles your preload script directly into an .mjs file
+      preload: path.join(__dirname, '../preload/index.js'),
+      sandbox: false // Required by Electron to load pure ESM preload modules
     },
   });
 
-  if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
-    mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
+  // Check if the development server is running
+  if (!app.isPackaged && process.env['ELECTRON_RENDERER_URL']) {
+    mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL']);
   } else {
-    mainWindow.loadFile(
-      path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`),
-    );
+    // Production fallback loading the compiled static HTML
+    mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'));
   }
 
   mainWindow.webContents.openDevTools();

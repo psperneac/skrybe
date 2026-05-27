@@ -1,12 +1,15 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { aiAPI, ChatMessage, ContextSize } from '../api/ai';
+import { aiAPI, ChatMessage, ContextSize } from '@/api/ai';
+import { ConfigSelector } from './ConfigSelector';
+import { DEFAULT_CONFIG_NAME } from '@/config';
 
 function App() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [prompt, setPrompt] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [contextSize, setContextSize] = useState<ContextSize>({ chars: 0, tokens: 0 });
+  const [selectedConfig, setSelectedConfig] = useState(DEFAULT_CONFIG_NAME);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -80,8 +83,8 @@ function App() {
     const { reasoning, text } = parseContent(msg.content);
 
     return (
-      <div key={index} style={{ marginBottom: '16px', padding: '8px', borderRadius: '8px' }}>
-        <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>
+      <div key={index} className="mb-4 p-2 rounded-lg">
+        <div className="font-bold mb-1">
           {msg.role === 'user' ? 'You' : 'Assistant'}:
         </div>
         {msg.role === 'user' ? (
@@ -89,9 +92,9 @@ function App() {
         ) : (
           <div>
             {reasoning && (
-              <details style={{ marginBottom: '8px' }}>
-                <summary style={{ cursor: 'pointer', color: '#666' }}>Thinking</summary>
-                <pre style={{ whiteSpace: 'pre-wrap', color: '#888', fontSize: '0.9em' }}>
+              <details className="mb-2">
+                <summary className="cursor-pointer text-neutral-500">Thinking</summary>
+                <pre className="whitespace-pre-wrap text-neutral-400 text-sm mt-1">
                   {reasoning}
                 </pre>
               </details>
@@ -106,38 +109,50 @@ function App() {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', padding: '16px', boxSizing: 'border-box' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-        <h1 style={{ margin: 0 }}>AI Chat</h1>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <span style={{ color: '#666', fontSize: '0.9em' }}>
+    <div className="flex flex-col h-screen p-4">
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="m-0">AI Chat</h1>
+        <div className="flex items-center gap-4">
+          <span className="text-neutral-500 text-sm">
             {contextSize.chars.toLocaleString()} chars / ~{contextSize.tokens.toLocaleString()} tokens
           </span>
-          <button onClick={handleClear} style={{ padding: '8px 16px' }}>
+          <ConfigSelector
+            selectedConfig={selectedConfig}
+            onSelect={setSelectedConfig}
+          />
+          <button
+            onClick={handleClear}
+            className="px-4 py-2 bg-neutral-200 hover:bg-neutral-300 rounded-md font-medium transition-colors"
+          >
             Clear
           </button>
         </div>
       </div>
 
-      <div style={{ flex: 1, overflowY: 'auto', border: '1px solid #ccc', borderRadius: '8px', padding: '16px', marginBottom: '16px' }}>
+      <div className="flex-1 overflow-y-auto border border-neutral-300 rounded-lg p-4 mb-4">
         {messages.map((msg, i) => renderMessage(msg, i))}
         <div ref={messagesEndRef} />
       </div>
 
-      <div style={{ display: 'flex', gap: '8px' }}>
+      <div className="flex gap-2">
         <textarea
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Enter your prompt... (Enter to send, Shift+Enter for new line)"
-          style={{ flex: 1, resize: 'none' }}
+          className="flex-1 resize-none px-3 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           rows={3}
           disabled={isLoading}
         />
-        <button onClick={handleSend} disabled={isLoading || !prompt.trim()}>
+        <button
+          onClick={handleSend}
+          disabled={isLoading || !prompt.trim()}
+          className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md font-medium transition-colors disabled:opacity-50"
+        >
           {isLoading ? 'Sending...' : 'Send'}
         </button>
       </div>
+
     </div>
   );
 }
