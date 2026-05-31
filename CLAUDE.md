@@ -5,35 +5,47 @@
 - **Name**: skrybe
 - **Type**: Electron desktop application
 - **Author**: Paul Sperneac
-- **Description**: Electron application with React UI, built with Electron Forge + Vite + TypeScript
+- **Description**: Electron application with React UI, built with electron-vite + Vite + TypeScript + Tailwind CSS
 
 ## Tech Stack
 
 | Layer | Technology | Version |
 | --- | --- | --- |
 | Runtime | Electron | 41.5.0 |
-| Build Tool | Electron Forge + Vite Plugin | 7.11.1 |
+| Build Tool | electron-vite | 5.0+ |
 | Language | TypeScript | 5.9 |
 | Bundler | Vite | 5.4.21 |
 | UI Framework | React | 19 |
+| Styling | Tailwind CSS | 4.3+ |
+| UI Components | Radix UI + shadcn/ui utilities | — |
 
 ## Project Structure
 
 ```text
 src/
-  main.ts         # Main process (IPC handlers, app lifecycle)
-  preload.ts      # Preload script (exposes API via contextBridge)
-  preload.d.ts    # TypeScript declarations for window API
-  renderer.tsx    # React renderer entry point (createRoot)
-  api/            # Typed wrappers for preload API
+  main/              # Main process (IPC handlers, app lifecycle)
+    index.ts
+  preload/           # Preload script (exposes API via contextBridge)
+    index.ts
+    index.d.ts       # TypeScript declarations for window API
+  renderer/          # Renderer process (React app)
+    renderer.tsx     # React entry point (createRoot)
+    app/
+      App.tsx
+      ConfigSelector.tsx
+    components/ui/
+      select.tsx
+  api/               # Typed wrappers for preload API
     counter.ts
-  app/            # React components
-    App.tsx
-index.html
-forge.config.ts
-vite.*.config.ts
-tsconfig.json
+    ai.ts
+  config.ts          # Shared config types & helpers
+  css.d.ts           # CSS module type declarations
+  global.css
+  style.css
+  lib/
+    utils.ts         # cn() utility (clsx + tailwind-merge)
 package.json
+tsconfig.json
 ```
 
 ## Electron Architecture
@@ -85,19 +97,27 @@ Never access `window` directly in components.
 ## Development
 
 ```bash
-npm start        # Run in dev mode with hot reload
-npm run lint     # Run ESLint
-npm run package # Package app
-npm run make     # Create distributable
+npm run dev        # Run in dev mode with electron-vite
+npm run build      # Build production bundle
+npm run preview    # Preview production build
+npm start          # Start the packaged app
+npm run package    # Build + package with electron-builder
 ```
 
-## Security (Fuses)
+## Dependencies
 
-Fuses are applied at package time to restrict Electron capabilities:
+### Dev Dependencies
+- `electron-vite` — build orchestration (replaced Electron Forge)
+- `electron-builder` — creates distributable packages
+- `electron` 41.5.0 — runtime
+- `@electron/fuses` — security fuses
 
-- RunAsNode: **OFF** - Prevents running as Node process
-- EnableCookieEncryption: **ON**
-- EnableNodeOptionsEnvironmentVariable: **OFF**
-- EnableNodeCliInspectArguments: **OFF**
-- EnableEmbeddedAsarIntegrityValidation: **ON**
-- OnlyLoadAppFromAsar: **ON**
+### Runtime Dependencies
+- `react` 19 + `react-dom` 19
+- `@radix-ui/react-select` — headless UI primitives
+- `openai` — OpenAI SDK client
+- `react-markdown` — Markdown rendering in chat
+
+### Styling
+- `tailwindcss` 4.x — utility-first CSS
+- `tailwind-merge` + `clsx` + `class-variance-authority` — shadcn/ui style composition
