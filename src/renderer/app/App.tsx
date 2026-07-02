@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { aiAPI, ChatMessage, ContextSize } from '@/api/ai';
 import { ConfigSelector } from './ConfigSelector';
+import { SettingsPage } from './SettingsPage';
+import { Settings, Trash2 } from 'lucide-react';
 import { DEFAULT_CONFIG_NAME } from '@/config';
 
 function App() {
@@ -10,6 +12,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [contextSize, setContextSize] = useState<ContextSize>({ chars: 0, tokens: 0 });
   const [selectedConfig, setSelectedConfig] = useState(DEFAULT_CONFIG_NAME);
+  const [showSettings, setShowSettings] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -35,6 +38,11 @@ function App() {
     const size = await aiAPI.getContextSize();
     setContextSize(size);
   };
+
+  // Sync selected config to main process whenever it changes
+  useEffect(() => {
+    aiAPI.setCurrentConfig(selectedConfig);
+  }, [selectedConfig]);
 
   const handleSend = async () => {
     if (!prompt.trim() || isLoading) return;
@@ -108,6 +116,14 @@ function App() {
     );
   };
 
+  if (showSettings) {
+    return (
+      <div className="flex flex-col h-screen p-4">
+        <SettingsPage onClose={() => setShowSettings(false)} />
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col h-screen p-4">
       <div className="flex justify-between items-center mb-4">
@@ -122,9 +138,17 @@ function App() {
           />
           <button
             onClick={handleClear}
-            className="px-4 py-2 bg-neutral-200 hover:bg-neutral-300 rounded-md font-medium transition-colors"
+            className="p-2 bg-neutral-200 hover:bg-neutral-300 rounded-md transition-colors"
+            title="Clear chat"
           >
-            Clear
+            <Trash2 className="w-5 h-5" />
+          </button>
+          <button
+            onClick={() => setShowSettings(true)}
+            className="p-2 bg-neutral-200 hover:bg-neutral-300 rounded-md transition-colors"
+            title="Settings"
+          >
+            <Settings className="w-5 h-5" />
           </button>
         </div>
       </div>

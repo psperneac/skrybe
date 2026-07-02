@@ -90,3 +90,7 @@ typings/
 
 # Electron-Forge
 out/
+
+# do NOT commit
+./.skrybe.json
+.skrybe.json

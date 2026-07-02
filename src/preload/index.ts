@@ -13,4 +13,7 @@ contextBridge.exposeInMainWorld('aiAPI', {
   deleteConfig: (name: string) => ipcRenderer.invoke('config:delete', name),
   saveConfig: (name: string, config: any) => ipcRenderer.invoke('config:save', name, config),
   getAllConfigs: () => ipcRenderer.invoke('config:getAll'),
+  getCurrentConfig: () => ipcRenderer.invoke('config:getCurrent'),
+  setCurrentConfig: (name: string) => ipcRenderer.invoke('config:setCurrent', name),
+  fetchModels: (config: any) => ipcRenderer.invoke('ai:fetchModels', config),
 });
