@@ -10,11 +10,19 @@ import {
   getCurrentConfigName,
   setCurrentConfigName,
 } from '../config';
-import type { AIConfig, AppConfig } from '../config';
+import type { AIConfig, AppConfig, WindowState } from '../config';
 
 const CONFIG_FILE_NAME = '.skrybe.json';
 
-
+function createDefaultWindowState(): WindowState {
+  return {
+    width: 800,
+    height: 600,
+    isMaximized: false,
+    isDevToolsOpen: false,
+    devToolsSplit: 50,
+  };
+}
 
 function createDefaultAppConfig(): AppConfig {
   return {
@@ -70,6 +78,18 @@ export function loadConfigs(): void {
     loaded.current = DEFAULT_CONFIG_NAME;
   }
   setAppConfig(loaded);
+}
+
+export function saveWindowState(state: WindowState): void {
+  const appConfig = getAppConfig();
+  appConfig.windowState = state;
+  setAppConfig(appConfig);
+  saveConfigs();
+}
+
+export function getWindowState(): WindowState {
+  const appConfig = getAppConfig();
+  return appConfig.windowState || createDefaultWindowState();
 }
 
 function saveConfigs(): void {

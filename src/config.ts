@@ -1,4 +1,4 @@
-export const DEFAULT_CONFIG_NAME = 'default';
+export const DEFAULT_CONFIG_NAME = "default";
 
 export interface AIConfig {
   endpoint: string;
@@ -12,9 +12,20 @@ export interface Configs {
   [name: string]: AIConfig;
 }
 
+export interface WindowState {
+  x?: number;
+  y?: number;
+  width: number;
+  height: number;
+  isMaximized: boolean;
+  isDevToolsOpen: boolean;
+  devToolsSplit: number;
+}
+
 export interface AppConfig {
   current: string;
   configs: Configs;
+  windowState?: WindowState;
 }
 
 let appConfig: AppConfig = {

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { aiAPI } from '@/api/ai';
+import { configAPI } from '@/api/config';
 import { AIConfig } from '@/config';
 import {
   Select,
@@ -22,7 +22,7 @@ export function ConfigSelector({ selectedConfig, onSelect }: ConfigSelectorProps
   }, []);
 
   const loadConfigs = async () => {
-    const cfg = await aiAPI.getAllConfigs();
+    const cfg = await configAPI.getAllConfigs();
     setConfigs(cfg);
   };
 

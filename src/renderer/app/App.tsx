@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { aiAPI, ChatMessage, ContextSize } from '@/api/ai';
+import { configAPI } from '@/api/config';
 import { ConfigSelector } from './ConfigSelector';
 import { SettingsPage } from './SettingsPage';
 import { Settings, Trash2 } from 'lucide-react';
@@ -41,7 +42,7 @@ function App() {
 
   // Sync selected config to main process whenever it changes
   useEffect(() => {
-    aiAPI.setCurrentConfig(selectedConfig);
+    configAPI.setCurrentConfig(selectedConfig);
   }, [selectedConfig]);
 
   const handleSend = async () => {

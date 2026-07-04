@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { aiAPI } from '@/api/ai';
+import { configAPI } from '@/api/config';
 import { AIConfig } from '@/config';
 import { Settings, Plus, Trash2, X, CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import {
@@ -88,14 +89,14 @@ export function SettingsPage({ onClose }: SettingsPageProps) {
   }, []);
 
   const loadConfigs = async () => {
-    const cfg = await aiAPI.getAllConfigs();
-    const current = await aiAPI.getCurrentConfig();
+    const cfg = await configAPI.getAllConfigs();
+    const current = await configAPI.getCurrentConfig();
     setConfigs(cfg);
     setCurrentConfigName(current);
   };
 
   const handleSetCurrent = async (name: string) => {
-    await aiAPI.setCurrentConfig(name);
+    await configAPI.setCurrentConfig(name);
     setCurrentConfigName(name);
   };
 
@@ -103,7 +104,7 @@ export function SettingsPage({ onClose }: SettingsPageProps) {
     if (isCreating && !newConfigName.trim()) return;
     
     const name = isCreating ? newConfigName.trim() : editingConfig!;
-    await aiAPI.saveConfig(name, formData);
+    await configAPI.saveConfig(name, formData);
     await loadConfigs();
     setIsCreating(false);
     setEditingConfig(null);
@@ -112,7 +113,7 @@ export function SettingsPage({ onClose }: SettingsPageProps) {
   };
 
   const handleDelete = async (name: string) => {
-    await aiAPI.deleteConfig(name);
+    await configAPI.deleteConfig(name);
     await loadConfigs();
     if (editingConfig === name) {
       setEditingConfig(null);
