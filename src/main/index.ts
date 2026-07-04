@@ -43,7 +43,7 @@ const createWindow = () => {
 
   // Ensure window is within screen bounds
   const displays = screen.getAllDisplays();
-  let { x, y, width, height, isMaximized, isDevToolsOpen } = savedState;
+  const { x, y, width, height, isMaximized, isDevToolsOpen } = savedState;
 
   // Validate position is on a visible display
   if (x !== undefined && y !== undefined) {

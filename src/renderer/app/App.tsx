@@ -56,7 +56,7 @@ function App() {
     setMessages(updatedMessages);
 
     try {
-      const response = await aiAPI.chat(userMessage);
+      await aiAPI.chat(userMessage);
       const newMessages = await aiAPI.getMessages();
       setMessages(newMessages);
       await refreshContextSize();
