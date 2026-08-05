@@ -1,0 +1,17 @@
+#!/bin/sh
+# Pre-commit hook to prevent committing sensitive files
+
+FORBIDDEN_FILES=".env .skrybe.json"
+FORBIDDEN_FOUND=""
+
+for file in $FORBIDDEN_FILES; do
+  if git diff --cached --name-only | grep -qxF "$file"; then
+    FORBIDDEN_FOUND="$FORBIDDEN_FOUND $file"
+  fi
+done
+
+if [ -n "$FORBIDDEN_FOUND" ]; then
+  echo "❌ Commit rejected: forbidden file(s) found:$FORBIDDEN_FOUND"
+  echo "   These files may contain sensitive data and should not be committed."
+  exit 1
+fi
