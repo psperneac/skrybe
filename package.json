@@ -9,7 +9,7 @@
     "dev": "electron-vite dev",
     "build": "electron-vite build",
     "preview": "electron-vite preview",
-    "start": "electron-vite . start",
+    "start": "env -u ELECTRON_RUN_AS_NODE electron-vite . start",
     "lint": "eslint --ext .ts,.tsx .",
     "package": "electron-vite build && electron-builder"
   },
@@ -29,7 +29,7 @@
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
     "@vitejs/plugin-react": "^4.7.0",
-    "electron": "41.5.0",
+    "electron": "^44.7.0",
     "electron-builder": "^26.8.1",
     "electron-vite": "^5.0.0",
     "eslint": "^8.57.1",
