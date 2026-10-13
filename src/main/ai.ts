@@ -7,11 +7,18 @@ export interface ChatMessage {
   content: string;
 }
 
-function createClient(config: AIConfig) {
-  return new OpenAI({
-    baseURL: config.endpoint,
-    apiKey: config.apiKey || "not-needed",
-  });
+// Cache clients so we reuse them across calls with the same config
+const clientCache = new Map<string, OpenAI>();
+
+function getClient(config: AIConfig): OpenAI {
+  const key = `${config.endpoint}::${config.apiKey}`;
+  if (!clientCache.has(key)) {
+    clientCache.set(key, new OpenAI({
+      baseURL: config.endpoint,
+      apiKey: config.apiKey || "not-needed",
+    }));
+  }
+  return clientCache.get(key)!;
 }
 
 function getActiveConfig() {
@@ -28,13 +35,22 @@ interface EndpointValidation {
   error?: string;
 }
 
+interface ModelInfoResult {
+  valid: boolean;
+  info: unknown;
+  error?: string;
+}
+
 export function registerAIHandlers(): void {
-  ipcMain.handle(
-    "ai:fetchModels",
+  ipcMain.handle("ai:fetchModels",
     async (_event, config: AIConfig): Promise<EndpointValidation> => {
       try {
-        const client = createClient(config);
+        const client = getClient(config);
         const response = await client.models.list();
+        // console.log(
+        //   "[AI] /v1/models response:",
+        //   JSON.stringify(response, null, 2),
+        // );
         const models: string[] = response.data.map((m) => m.id).sort();
         return { valid: true, models };
       } catch (err) {
@@ -42,6 +58,21 @@ export function registerAIHandlers(): void {
           err instanceof Error ? err.message : "Failed to fetch models";
         console.error("[AI] Failed to fetch models:", message);
         return { valid: false, models: [], error: message };
+      }
+    },
+  );
+
+  ipcMain.handle("ai:fetchModelInfo",
+    async (_event, config: AIConfig): Promise<ModelInfoResult> => {
+      try {
+        const client = getClient(config);
+        const info = await client.get("/model/info");
+        return { valid: true, info };
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : "Failed to fetch model info";
+        console.error("[AI] Failed to fetch model info:", message);
+        return { valid: false, info: null, error: message };
       }
     },
   );
@@ -68,7 +99,7 @@ export function registerAIHandlers(): void {
     }));
 
     const config = getActiveConfig();
-    const response = await createClient(config).chat.completions.create({
+    const response = await getClient(config).chat.completions.create({
       model: config.modelName,
       messages: messagesToSend,
       temperature: config.temperature,

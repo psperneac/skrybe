@@ -93,9 +93,21 @@ export function getWindowState(): WindowState {
 }
 
 function saveConfigs(): void {
-  // Always save to local path for development convenience
+  // Save to the same location where config was loaded from
   const localPath = path.join(process.cwd(), CONFIG_FILE_NAME);
-  fs.writeFileSync(localPath, JSON.stringify(getAppConfig(), null, 2));
+  const homePath = path.join(os.homedir(), CONFIG_FILE_NAME);
+
+  let configPath: string;
+  if (fs.existsSync(localPath)) {
+    configPath = localPath;
+  } else if (fs.existsSync(homePath)) {
+    configPath = homePath;
+  } else {
+    // No existing config, create at local path
+    configPath = localPath;
+  }
+
+  fs.writeFileSync(configPath, JSON.stringify(getAppConfig(), null, 2));
 }
 
 export function registerConfigHandlers(): void {

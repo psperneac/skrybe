@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { aiAPI } from '@/api/ai';
 import { configAPI } from '@/api/config';
 import { AIConfig } from '@/config';
-import { Settings, Plus, Trash2, X, CheckCircle, XCircle, Loader2 } from 'lucide-react';
+import { Settings, Plus, Trash2, X, CheckCircle, XCircle, Loader2, Copy } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -10,7 +10,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/renderer/components/ui/select';
-import { Combobox } from '@/renderer/components/ui/combobox';
 import { cn } from '@/lib/utils';
 
 interface SettingsPageProps {
@@ -292,26 +291,40 @@ export function SettingsPage({ onClose }: SettingsPageProps) {
 
                 <div>
                   <label className="block text-sm font-medium mb-1">Model Name</label>
-                  {availableModels.length > 0 ? (
-                    <Combobox
-                      value={formData.modelName}
-                      onValueChange={(value) => setFormData({ ...formData, modelName: value })}
-                      options={availableModels}
-                      placeholder="Select a model..."
-                    />
-                  ) : (
-                    <input
-                      type="text"
-                      value={formData.modelName}
-                      onChange={(e) => setFormData({ ...formData, modelName: e.target.value })}
-                      placeholder="Qwen/Qwen3.5-72B"
-                      className="w-full px-3 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  )}
+                  <input
+                    type="text"
+                    value={formData.modelName}
+                    onChange={(e) => setFormData({ ...formData, modelName: e.target.value })}
+                    placeholder="Qwen/Qwen3.5-72B or click a model below"
+                    className="w-full px-3 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
                   {availableModels.length > 0 && (
-                    <p className="mt-1 text-xs text-neutral-500">
-                      {availableModels.length} model{availableModels.length !== 1 ? 's' : ''} available. Type to filter or enter a custom name.
-                    </p>
+                    <div className="mt-2">
+                      <p className="text-xs text-neutral-500 mb-2">
+                        {availableModels.length} model{availableModels.length !== 1 ? 's' : ''} available. Click to select:
+                      </p>
+                      <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto">
+                        {availableModels.map((model) => (
+                          <div
+                            key={model}
+                            className="group relative px-2 py-1 bg-white border border-neutral-300 rounded text-sm cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors"
+                            onClick={() => setFormData({ ...formData, modelName: model })}
+                          >
+                            <span>{model}</span>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigator.clipboard.writeText(model);
+                              }}
+                              className="opacity-0 group-hover:opacity-100 ml-1 p-0.5 hover:bg-neutral-200 rounded transition-opacity"
+                              title="Copy model name"
+                            >
+                              <Copy className="w-3 h-3" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   )}
                 </div>
 

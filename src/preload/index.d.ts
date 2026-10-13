@@ -9,6 +9,7 @@ export interface AIAPI {
   clear: () => Promise<ChatMessage[]>;
   getContextSize: () => Promise<{ chars: number; tokens: number }>;
   fetchModels: (config: unknown) => Promise<string[]>;
+  fetchModelInfo: (config: unknown) => Promise<{ valid: boolean; info: unknown; error?: string }>;
 }
 
 export interface ConfigAPI {

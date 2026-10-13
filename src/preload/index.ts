@@ -7,6 +7,7 @@ const aiAPI = {
   clear: () => ipcRenderer.invoke('chat:clear'),
   getContextSize: () => ipcRenderer.invoke('chat:contextSize'),
   fetchModels: (config: unknown) => ipcRenderer.invoke('ai:fetchModels', config),
+  fetchModelInfo: (config: unknown) => ipcRenderer.invoke('ai:fetchModelInfo', config),
 };
 
 // Config API - configuration management
