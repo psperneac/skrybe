@@ -11,6 +11,7 @@
     "preview": "electron-vite preview",
     "start": "env -u ELECTRON_RUN_AS_NODE electron-vite . start",
     "lint": "eslint --ext .ts,.tsx .",
+    "test": "vitest run",
     "package": "electron-vite build && electron-builder"
   },
   "keywords": [],
@@ -36,7 +37,8 @@
     "eslint-plugin-import": "^2.32.0",
     "tailwindcss": "^4.3.0",
     "typescript": "5.9",
-    "vite": "^5.4.21"
+    "vite": "^5.4.21",
+    "vitest": "^2.1.9"
   },
   "dependencies": {
     "@radix-ui/react-dropdown-menu": "^2.1.25",
